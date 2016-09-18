@@ -17,7 +17,7 @@ module.exports = function (grunt) {
             }
         },
         html2js: {
-            dist_tpls: {
+            dist: {
                 options: {
                     module: null, // no bundle module for all the html2js templates
                     base: '.'
@@ -31,14 +31,14 @@ module.exports = function (grunt) {
             }
         },
         'string-replace': {
-            dist_tpls: {
+            dist: {
                 files: {
-                    'build/': 'src/rcalendar/calendar.js'
+                    'build/': 'src/rcalendar/*.js'
                 },
                 options: {
                     replacements: [{
-                        pattern: 'angular.module(\'ui.rCalendar\', [])',
-                        replacement: 'angular.module(\'ui.rCalendar\', [\'ui.rCalendar.tpls\'])'
+                        pattern: '.module(\'ui.rCalendar\', [])',
+                        replacement: '.module(\'ui.rCalendar\', [\'ui.rCalendar.tpls\'])'
                     }]
                 }
             }
@@ -54,27 +54,33 @@ module.exports = function (grunt) {
             }
         },
         concat: {
-            dist_tpls: {
+            'dist-html-modules': {
+                src: 'build/template/**/*.html.js',
+                dest: 'build/calendar-html-modules.js'
+            },
+            'dist-modules': {
                 options: {
-                    banner: 'angular.module("ui.rCalendar.tpls", [' + grunt.file.expand('template/**/*.html').map(enquote) + ']);\n',
+                    banner: 'angular.module("ui.rCalendar.tpls", [' + grunt.file.expand('template/**/*.html').map(enquote) + ']);\n\n',
                 },
-                src: ['build/src/**/calendar.js',
-                    'build/template/**/*.html.js',
-                ],
+                src: 'build/src/**/*.module.js',
+                dest: 'build/calendar-modules.js'
+            },
+            'dist-all-js': {
+                src: ['build/src/**/*.js', '!build/src/**/*.module.js'],
+                dest: 'dist/js/calendar-tpls.js'
+            },
+            'dist-all': {
+                src:['build/calendar-html-modules.js', 'build/calendar-modules.js', 'dist/js/calendar-tpls.js'],
                 dest: 'dist/js/calendar-tpls.js'
             }
         },
         uglify: {
-            dist_tpls: {
+            dist: {
                 options: {
                     mangle: false
                 },
                 src: ['dist/js/calendar-tpls.js'],
                 dest: 'dist/js/calendar-tpls.min.js'
-            },
-            dist: {
-                src: ['src/rcalendar/calendar.js'],
-                dest: 'dist/js/calendar.min.js'
             }
         },
         cssmin: {
@@ -101,7 +107,17 @@ module.exports = function (grunt) {
     grunt.option('force', true);
 
     //Build task.
-    grunt.registerTask('build', ['jshint', 'copy:css', 'uglify:dist', 'cssmin:dist']);
-    //Build task.
-    grunt.registerTask('build-tpls', ['jshint', 'copy:css', 'html2js:dist_tpls', 'string-replace:dist_tpls', 'concat:dist_tpls', 'uglify:dist_tpls', 'cssmin:dist', 'clean']);
+    grunt.registerTask('build', [
+        'jshint',
+        'copy:css',
+        'html2js:dist',
+        'string-replace:dist',
+        'concat:dist-html-modules',
+        'concat:dist-modules',
+        'concat:dist-all-js',
+        'concat:dist-all',
+        'uglify:dist',
+        'cssmin:dist',
+        'clean'
+    ]);
 };
