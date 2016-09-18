@@ -16,6 +16,8 @@
             showEventDetail: true,
             startingDay: 0,
             eventSource: null,
-            queryMode: 'local'
+            queryMode: 'local',
+            dayViewHourIntervals: 1,
+            showAllDayEventHeader: true
         });
 })();

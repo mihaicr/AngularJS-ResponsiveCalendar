@@ -4,6 +4,7 @@ A pure AngularJS responsive calendar directive
 If you want to only use it in Ionic framework, please check https://github.com/twinssbc/Ionic-Calendar for the Ionic specific version
 
 # Demo
+See a demo of the original code below:
 http://twinssbc.github.io/AngularJS-ResponsiveCalendar/demo/
 
 # Usage
@@ -78,6 +79,10 @@ The callback function triggered when the range or mode is changed if the queryMo
                 $scope.eventSource=events;
             });
         };
+* dayViewHourIntervals
+An integer representing the number of intervals to be displayed in an hour when viewing the daily calendar. Default is 1, the maximum is 10.
+* showAllDayEventHeader
+Whether all day events are to be displayed at the top in day view mode.
 
 * eventSelected    
 The callback function triggered when an event is clicked

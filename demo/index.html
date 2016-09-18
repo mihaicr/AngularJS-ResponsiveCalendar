@@ -11,19 +11,6 @@
     <script src="calendarDemoCtrl.js"></script>
 </head>
 <body>
-<header class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/">AngularJS Responsive Calendar</a>
-        </div>
-        <p class="navbar-text hidden-xs">A pure AngularJS responsive calendar directive</p>
-        <ul class="nav navbar-nav navbar-right hidden-xs">
-            <li><a href="https://github.com/mihaicr/AngularJS-ResponsiveCalendar"><img style="display:inline-block"
-                                                                                        src="github-icon.png"/> View on
-                GitHub</a></li>
-        </ul>
-    </div>
-</header>
 <section class="content" style="margin-top: 70px;">
     <section class="container">
         <section ng-controller="CalendarDemoCtrl" ng-init="loadEvents()">
@@ -57,7 +44,10 @@
                 <calendar ng-model="currentDate" calendar-mode="mode" event-source="eventSource"
                           range-changed="reloadSource(startTime, endTime)"
                           event-selected="onEventSelected(event)"
-                          time-selected="onTimeSelected(selectedTime)"></calendar>
+                          time-selected="onTimeSelected(selectedTime)"
+                          format-hour-column="HH:mm"
+                          day-view-hour-intervals="4"
+                          show-all-day-event-header="false"></calendar>
             </div>
         </section>
     </section>

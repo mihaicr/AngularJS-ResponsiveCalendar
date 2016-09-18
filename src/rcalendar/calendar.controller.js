@@ -25,7 +25,7 @@
         $scope.move = move;
         
         var options = ['formatDay', 'formatDayHeader', 'formatDayTitle', 'formatWeekTitle', 'formatMonthTitle', 'formatWeekViewDayHeader', 'formatHourColumn',
-            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode'];
+            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode', 'dayViewHourIntervals', 'showAllDayEventHeader'];
 
         angular.forEach(options, loadConfigurationOption);
 
