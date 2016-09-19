@@ -18,6 +18,7 @@
             eventSource: null,
             queryMode: 'local',
             dayViewHourIntervals: 1,
-            showAllDayEventHeader: true
+            showAllDayEventHeader: true,
+            allDayIntervalLabelFormatter: undefined
         });
 })();

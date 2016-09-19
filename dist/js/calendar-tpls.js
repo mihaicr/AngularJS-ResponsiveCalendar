@@ -22,7 +22,7 @@ angular.module("template/rcalendar/calendar.html", []).run(["$templateCache", fu
 angular.module("template/rcalendar/day.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/rcalendar/day.html",
     "<div>\n" +
-    "    <div ng-if=\"showAllDayEventHeader\" class=\"dayview-allday-table\">\n" +
+    "    <div ng-if=\"CalendarController.showAllDayEventHeader\" class=\"dayview-allday-table\">\n" +
     "        <div class=\"dayview-allday-label\">\n" +
     "            all day\n" +
     "        </div>\n" +
@@ -50,7 +50,7 @@ angular.module("template/rcalendar/day.html", []).run(["$templateCache", functio
     "            <tbody>\n" +
     "            <tr ng-repeat=\"tm in rows track by $index\">\n" +
     "                <td class=\"calendar-hour-column text-center\">\n" +
-    "                    {{tm.time | date: formatHourColumn}}\n" +
+    "                    {{CalendarController.formatDayHour(tm.time)}}\n" +
     "                </td>\n" +
     "                <td class=\"calendar-cell\" ng-click=\"select(tm.time)\">\n" +
     "                    <div ng-class=\"{'calendar-event-wrap': tm.events}\" ng-if=\"tm.events\">\n" +
@@ -197,7 +197,8 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
             eventSource: null,
             queryMode: 'local',
             dayViewHourIntervals: 1,
-            showAllDayEventHeader: true
+            showAllDayEventHeader: true,
+            allDayIntervalLabelFormatter: undefined
         });
 })();
 
@@ -208,10 +209,10 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
         .module('ui.rCalendar')
         .controller('ui.rCalendar.CalendarController', CalendarController);
 
-    CalendarController.$inject = ['$scope', '$attrs', '$parse', '$interpolate', '$log', 'dateFilter', 'calendarConfig'];
+    CalendarController.$inject = ['$scope', '$attrs', '$parse', '$interpolate', '$log', '$filter', 'calendarConfig'];
 
     /* @ngInject */
-    function CalendarController($scope, $attrs, $parse, $interpolate, $log, dateFilter, calendarConfig) {
+    function CalendarController($scope, $attrs, $parse, $interpolate, $log, $filter, calendarConfig) {
         
         var vm = this,
             ngModelCtrl = {$setViewValue: angular.noop}; // nullModelCtrl;
@@ -225,10 +226,11 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
         vm.rangeChanged = rangeChanged;
         vm.placeEvents = placeEvents;
         vm.placeAllDayEvents = placeAllDayEvents;
+        vm.formatDayHour = formatDayHour;
         $scope.move = move;
         
         var options = ['formatDay', 'formatDayHeader', 'formatDayTitle', 'formatWeekTitle', 'formatMonthTitle', 'formatWeekViewDayHeader', 'formatHourColumn',
-            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode', 'dayViewHourIntervals', 'showAllDayEventHeader'];
+            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode', 'dayViewHourIntervals', 'showAllDayEventHeader', 'allDayIntervalLabelFormatter'];
 
         angular.forEach(options, loadConfigurationOption);
 
@@ -246,7 +248,6 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
                 $parse($attrs.ngModel).assign($scope.$parent, vm.currentCalendarDate);
             }
         }
-
 
         function loadConfigurationOption(key, index) {
             vm[key] = angular.isDefined($attrs[key]) ? (index < 7 ? $interpolate($attrs[key])($scope.$parent) : $scope.$parent.$eval($attrs[key])) : calendarConfig[key];
@@ -436,6 +437,17 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
         function placeAllDayEvents(orderedEvents) {
             calculatePosition(orderedEvents);
         }
+
+        function formatDayHour(time) {
+            var result;
+            if (angular.isFunction(vm.allDayIntervalLabelFormatter)) {
+                result = vm.allDayIntervalLabelFormatter(time);
+            } else {
+                result = $filter('date')(time, vm.formatHourColumn);
+            }
+
+            return result;
+        }
     }
 })();
 (function () {
@@ -459,6 +471,7 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
             },
             require: ['calendar', '?^ngModel'],
             controller: 'ui.rCalendar.CalendarController',
+            controllerAs: 'CalendarController',
             link: link
         };
         return responsiveCalendar;
@@ -526,12 +539,14 @@ angular.module("ui.rCalendar.tpls", ["template/rcalendar/calendar.html","templat
 
             function updateScrollGutter() {
                 var children = element.children();
-                var allDayEventGutterWidth;
+                var allDayEventGutterWidth, normalEventBody;
                 if (ctrl.showAllDayEventHeader) {
                     var allDayEventBody = children[0].children[1];
                     allDayEventGutterWidth = allDayEventBody.offsetWidth - allDayEventBody.clientWidth;
+                    normalEventBody = children[1];
+                } else {
+                    normalEventBody = children[0];
                 }
-                var normalEventBody = children[1];
                 var normalEventGutterWidth = normalEventBody.offsetWidth - normalEventBody.clientWidth;
                 var gutterWidth = allDayEventGutterWidth || normalEventGutterWidth || 0;
                 if (gutterWidth > 0) {

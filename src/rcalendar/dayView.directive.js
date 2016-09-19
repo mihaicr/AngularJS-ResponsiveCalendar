@@ -38,12 +38,14 @@
 
             function updateScrollGutter() {
                 var children = element.children();
-                var allDayEventGutterWidth;
+                var allDayEventGutterWidth, normalEventBody;
                 if (ctrl.showAllDayEventHeader) {
                     var allDayEventBody = children[0].children[1];
                     allDayEventGutterWidth = allDayEventBody.offsetWidth - allDayEventBody.clientWidth;
+                    normalEventBody = children[1];
+                } else {
+                    normalEventBody = children[0];
                 }
-                var normalEventBody = children[1];
                 var normalEventGutterWidth = normalEventBody.offsetWidth - normalEventBody.clientWidth;
                 var gutterWidth = allDayEventGutterWidth || normalEventGutterWidth || 0;
                 if (gutterWidth > 0) {

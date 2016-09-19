@@ -1,6 +1,6 @@
 angular.module('calendarDemoApp', ['ui.rCalendar']);
 
-angular.module('calendarDemoApp').controller('CalendarDemoCtrl', ['$scope', function ($scope) {
+angular.module('calendarDemoApp').controller('CalendarDemoCtrl', ['$scope', '$filter', function ($scope, $filter) {
     'use strict';
     $scope.changeMode = function (mode) {
         $scope.mode = mode;
@@ -29,6 +29,15 @@ angular.module('calendarDemoApp').controller('CalendarDemoCtrl', ['$scope', func
 
     $scope.onTimeSelected = function (selectedTime) {
         console.log('Selected time: ' + selectedTime);
+    };
+
+    $scope.dayIntervalFormatter = function(date) {
+        var result = '',
+            minutes = date.getMinutes();
+        if (minutes === 0 || minutes === 30) {
+            result = $filter('date')(date, 'HH:mm');
+        }
+        return result;
     };
 
     function createRandomEvents() {

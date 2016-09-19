@@ -5,10 +5,10 @@
         .module('ui.rCalendar')
         .controller('ui.rCalendar.CalendarController', CalendarController);
 
-    CalendarController.$inject = ['$scope', '$attrs', '$parse', '$interpolate', '$log', 'dateFilter', 'calendarConfig'];
+    CalendarController.$inject = ['$scope', '$attrs', '$parse', '$interpolate', '$log', '$filter', 'calendarConfig'];
 
     /* @ngInject */
-    function CalendarController($scope, $attrs, $parse, $interpolate, $log, dateFilter, calendarConfig) {
+    function CalendarController($scope, $attrs, $parse, $interpolate, $log, $filter, calendarConfig) {
         
         var vm = this,
             ngModelCtrl = {$setViewValue: angular.noop}; // nullModelCtrl;
@@ -22,10 +22,11 @@
         vm.rangeChanged = rangeChanged;
         vm.placeEvents = placeEvents;
         vm.placeAllDayEvents = placeAllDayEvents;
+        vm.formatDayHour = formatDayHour;
         $scope.move = move;
         
         var options = ['formatDay', 'formatDayHeader', 'formatDayTitle', 'formatWeekTitle', 'formatMonthTitle', 'formatWeekViewDayHeader', 'formatHourColumn',
-            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode', 'dayViewHourIntervals', 'showAllDayEventHeader'];
+            'showWeeks', 'showEventDetail', 'startingDay', 'eventSource', 'queryMode', 'dayViewHourIntervals', 'showAllDayEventHeader', 'allDayIntervalLabelFormatter'];
 
         angular.forEach(options, loadConfigurationOption);
 
@@ -43,7 +44,6 @@
                 $parse($attrs.ngModel).assign($scope.$parent, vm.currentCalendarDate);
             }
         }
-
 
         function loadConfigurationOption(key, index) {
             vm[key] = angular.isDefined($attrs[key]) ? (index < 7 ? $interpolate($attrs[key])($scope.$parent) : $scope.$parent.$eval($attrs[key])) : calendarConfig[key];
@@ -232,6 +232,17 @@
 
         function placeAllDayEvents(orderedEvents) {
             calculatePosition(orderedEvents);
+        }
+
+        function formatDayHour(time) {
+            var result;
+            if (angular.isFunction(vm.allDayIntervalLabelFormatter)) {
+                result = vm.allDayIntervalLabelFormatter(time);
+            } else {
+                result = $filter('date')(time, vm.formatHourColumn);
+            }
+
+            return result;
         }
     }
 })();

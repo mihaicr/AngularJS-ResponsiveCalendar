@@ -19,6 +19,7 @@
             },
             require: ['calendar', '?^ngModel'],
             controller: 'ui.rCalendar.CalendarController',
+            controllerAs: 'CalendarController',
             link: link
         };
         return responsiveCalendar;
